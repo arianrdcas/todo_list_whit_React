@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, Fragment } from "react";
+import { useState, Fragment, useRef, useEffect } from "react";
 import { IoIosClose } from "react-icons/io";
 
 const Formulario = () => {
@@ -8,36 +8,41 @@ const Formulario = () => {
 	
 	const[list, setList]= useState([]);
 
-	const[error, setError]= useState("");
+	const[mensaje, setMensaje]= useState(" ");
 
-	const[fallo, setFallo]= useState("false");
+	const[isShown, setIsShown] = useState(true);
 
-	const [isShown, setIsShown] = useState(false);
+	const refButton = useRef([]);
+	refButton.current = [];
+
+    const addToButtonRef = (el) => {
+
+		if (el && !refButton.current.includes(el)){
+			refButton.current.push(el);
+		}
+	}
 
 	function handleChange(e) {
 		setDescription(e.target.value);
 	}
-	
-	const boxRef = React.useRef(null);
 
-	const handleMouseEnter = () => {
-		list.item(setIsShown(true))
+	const handleMouseEnter = (indexItem) => {
+		console.log(refButton.current[indexItem].target);
+			setIsShown(false);
+	}
+
+	const handleMouseLeave = (indexItem) => {
+		setIsShown(true);
 	};
-
-	const handleMouseLeave = () => {
-		setIsShown(false)
-	};
-
 
 	const agregarTask= ()=>{
-		//e.preventDefault()
-		if(!description.trim()){
-			setFallo(true)
-			setError('Introduce una tarea')
-			return
-		}
 		setList([...list, description])
 		setDescription("")
+		setMensaje("")
+	}
+
+	const showMensaje= ()=>{
+		setMensaje("Por favor, escriba una tarea")
 	}
 
 	const borrarTask = (indexItem)=>{
@@ -45,107 +50,59 @@ const Formulario = () => {
 		setList(filtro)
 	}
 
-	/*return (
-		<>
-		{list && list.length? (
-				" " ) : <h3>"Sin tareas, agregue una tarea"</h3>
-		}
-
-		<div className="posit">
-    		<form >
-				{list.map((item,index) => 
-						<div key= {index}>
-							<div>{index} </div>
-							<input
-								type="text"
-								className="text"
-								placeholder="Que vas a hacer?"
-								onChange={(e)=>{setDescription(e.target.value)}}
-							/>
-							<button
-								type="button"
-								className="button pink"
-								onClick={()=>{borrarTask(index)}} 
-							>
-								<IoIosClose />
-							</button>
-						</div>				
-					)	
-				}
-			</form>
-			<button 
-				onClick={(e)=>{agregarTask(e)}} 
-				className="btn btn-info btn-block" type="submit">Add
-			</button>
-		</div>
-		</>
-	);*/
 	return (
 		<Fragment>
-			<h2 className="d-flex justify-content-center my-4 text-secondary text-center">TO-DO LIST</h2>
+			<h2 className="d-flex justify-content-center my-4 text-secondary text-center">TO-DO</h2>
 			<div className="posit">
-			{
-				fallo ?(
-					<span>{error}</span>
-				) :
-				(
-					<span></span>
-				)
-			}
+				{list.length === 0 ? <h6> "Sin tareas, agregue una tarea"</h6>: null}
+				<br />
+			
 			<div className="d-flex justify-content-center">
 			
 				<input
-				type="text"
+				type="text" 
 				placeholder="Escribe tu tarea"
+				value={description}
 				onChange={handleChange}
 				onKeyPress={(event,e) => {
-					if (event.key === 'Enter') {
-						agregarTask()
-					}
+					description!=="" && event.key === 'Enter'? agregarTask(): showMensaje()
 				}}
-				value={description}
 				/>
 			</div>
-
-		
+			<span>{mensaje} </span>
+				
 			<div>
 				<br />
-				
-				{list.map((item, index) => (
-					<ul>
-						<li>
-							<div key={index} 
-								//onMouseEnter={() => setIsShown(true)}
-								//onMouseLeave={() => setIsShown(false)}	
-								
-								//style={{ backgroundColor: 'red' }}
-								ref={boxRef}
-								onMouseEnter={handleMouseEnter}
-								onMouseLeave={handleMouseLeave}
-								>
-						
+				<ul>
 
+					{list.map((item, index) => (
+						<li key={"element"+index}>
+							<div  
+								onMouseEnter={() => handleMouseEnter(index)}
+								onMouseLeave={handleMouseLeave}
+							>
 								{item}
+								<button id={"button"+index}
+								    ref={addToButtonRef}
+									hidden = {isShown}
+									onClick={() => borrarTask(index)}>
+									<IoIosClose />
+								</button>
 								
-								{isShown && (
-									<button className="button pink" 
-										onClick={() => borrarTask(index)}>
-											<IoIosClose />
-									</button>
-								)}
 								<hr />
 							</div>
 						</li>
-					</ul>
-				))}
-				<h6 className="ms-3 text-secondary">{list.length} tareas creadas</h6>
+					))}
+				</ul>
+				
+				<span id="h4">{list.length} tareas creadas</span>
+				<br />
 			</div>
 			</div>
 		</Fragment>	
 
 	);
+
 }
 
 export default Formulario;
-
-

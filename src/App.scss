@@ -16,6 +16,7 @@
     margin: auto;
     width: 600px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; 
+    padding: 20px;
 }
 
 input{
@@ -45,8 +46,23 @@ li{
 }
 
 span{
-    color: rgb(0, 255, 13);
-    font-size: 2.0em;
+    color: rgb(255, 0, 0);
+    font-size: small;
     font-style: italic;
-    margin-left: 180px;
+    margin-left: 80px;
+}
+
+
+h6{
+    color: gray;
+    text-align: center;
+    font-style: italic;   
+}
+
+
+#h4{
+    font-size: small;
+    color: rgb(66, 42, 173);
+    text-align: left;  
+    margin-left: 0;
 }
