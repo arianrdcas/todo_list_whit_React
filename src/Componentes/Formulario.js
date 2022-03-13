@@ -2,15 +2,25 @@ import React from "react";
 import { useState, Fragment, useRef, useEffect } from "react";
 import { IoIosClose } from "react-icons/io";
 
+
+
 const Formulario = () => {
 	
-	const[description, setDescription]= useState("");
+	const[label, setLabel]= useState("");
+
+	const[done, setDone]= useState(false);
 	
 	const[list, setList]= useState([]);
+
+	useEffect(()=> {
+		getList();
+	}, []);
+
 
 	const[mensaje, setMensaje]= useState(" ");
 
 	const[isShown, setIsShown] = useState(true);
+
 
 	const refButton = useRef([]);
 	refButton.current = [];
@@ -23,7 +33,7 @@ const Formulario = () => {
 	}
 
 	function handleChange(e) {
-		setDescription(e.target.value);
+		setLabel(e.target.value);
 	}
 
 	const handleMouseEnter = (indexItem) => {
@@ -35,11 +45,26 @@ const Formulario = () => {
 		setIsShown(true);
 	};
 
-	const agregarTask= ()=>{
-		setList([...list, description])
-		setDescription("")
+
+	const agregarTask = async () => {
+		const data = await fetch('https://assets.breatheco.de/apis/fake/todos/user/alesanchezr',{
+    	'method':'GET',
+		headers : {
+			'Content-Type':'application/json'
+		}, 
+    })
+		const task = await data.json();
+		setList(task);
+
+		const newtask = {
+			done,
+		    label
+		}
+
+		setList([...list, newtask])
+		setLabel("")
 		setMensaje("")
-	}
+	};
 
 	const showMensaje= ()=>{
 		setMensaje("Por favor, escriba una tarea")
@@ -49,6 +74,32 @@ const Formulario = () => {
 		const filtro = list.filter((list, index) => index !== indexItem)
 		setList(filtro)
 	}
+
+
+	const getList = async () => {
+		const data = await fetch('https://assets.breatheco.de/apis/fake/todos/user/alesanchezr',{
+      	'method':'GET',
+		headers : {
+			'Content-Type':'application/json'
+		}, 
+    	})
+		const task = await data.json();
+		setList(task);
+	};
+
+
+
+	const delAllList = async () => {
+		const data = await fetch('https://assets.breatheco.de/apis/fake/todos/user/alesanchezr',{
+      	'method':'GET',
+		headers : {
+			'Content-Type':'application/json'
+		}, 
+    	})
+		const task = await data.json();
+		setList([]);
+	};
+
 
 	return (
 		<Fragment>
@@ -62,10 +113,10 @@ const Formulario = () => {
 				<input
 				type="text" 
 				placeholder="Escribe tu tarea"
-				value={description}
+				value={label}
 				onChange={handleChange}
 				onKeyPress={(event,e) => {
-					description!=="" && event.key === 'Enter'? agregarTask(): showMensaje()
+					label!=="" && event.key === 'Enter'? agregarTask(): showMensaje()
 				}}
 				/>
 			</div>
@@ -74,14 +125,14 @@ const Formulario = () => {
 			<div>
 				<br />
 				<ul>
-
+					
 					{list.map((item, index) => (
 						<li key={"element"+index}>
 							<div  
 								onMouseEnter={() => handleMouseEnter(index)}
 								onMouseLeave={handleMouseLeave}
 							>
-								{item}
+								{item.label}
 								<button id={"button"+index}
 								    ref={addToButtonRef}
 									hidden = {isShown}
@@ -96,6 +147,7 @@ const Formulario = () => {
 				</ul>
 				
 				<span id="h4">{list.length} tareas creadas</span>
+				{list.length !== 0 ? (<button type="button" id="primary" onClick = {delAllList}> Eliminar todas las tareas</button>) :null}	
 				<br />
 			</div>
 			</div>
